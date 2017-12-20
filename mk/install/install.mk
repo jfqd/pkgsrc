@@ -370,16 +370,17 @@ install-ctf: plist
 .PHONY: install-strip-debug
 install-strip-debug: plist
 	@${STEP_MSG} "Automatic stripping of debug information"
-	${RUN}${CAT} ${_PLIST_NOKEYWORDS} \
-	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|' \
-	| while read f; do \
-		tmp_f="$${f}.XXX"; \
-		if ${STRIP} -g -o "$${tmp_f}" "$${f}" 2> /dev/null; then \
-			[ ! -f "$${f}" ] || \
-			    ${MV} "$${tmp_f}" "$${f}"; \
-		else \
-			${RM} -f "$${tmp_f}"; \
-		fi \
+	${RUN}${CAT} ${_PLIST_NOKEYWORDS}				\
+	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
+	| while read f; do						\
+		[ ! -h "$${f}" ] || continue;				\
+		tmp_f="$${f}.XXX";					\
+		if ${STRIP_DBG} -o "$${tmp_f}" "$${f}" 2>/dev/null; then \
+			if [ -f "$${tmp_f}" -a -f "$${f}" ]; then	\
+				${MV} "$${tmp_f}" "$${f}";		\
+			fi;						\
+		fi;							\
+		${RM} -f "$${tmp_f}";					\
 	done
 
 ######################################################################
