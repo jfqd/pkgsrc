@@ -192,6 +192,9 @@ _INSTALL_ALL_TARGETS+=		do-install
 _INSTALL_ALL_TARGETS+=		post-install
 .endif
 _INSTALL_ALL_TARGETS+=		plist
+.if ${_PKGSRC_USE_CTF} == "yes"
+_INSTALL_ALL_TARGETS+=		install-ctf
+.endif
 .if !empty(STRIP_DEBUG:M[Yy][Ee][Ss])
 _INSTALL_ALL_TARGETS+=		install-strip-debug
 .endif
@@ -368,6 +371,45 @@ ${tgt}-multi:
 .endif
 
 ######################################################################
+### install-ctf (PRIVATE)
+######################################################################
+### install-ctf creates CTF information from debug binaries.
+###
+.PHONY: install-ctf
+install-ctf: plist
+	@${STEP_MSG} "Generating CTF data"
+	@${RM} -f ${WRKDIR}/.ctfdata ${WRKDIR}/.ctffail
+	${RUN}${CAT} ${_PLIST_NOKEYWORDS}				\
+	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
+	| while read f; do						\
+		[ ! -h "$${f}" ] || continue;				\
+		/bin/file -b "$${f}" | grep ^ELF >/dev/null || continue; \
+		if /bin/elfdump "$${f}" | grep SUNW_ctf >/dev/null; then \
+			continue;					\
+		fi;							\
+		case "$${f}" in						\
+		${CTF_FILES_SKIP:@p@${p}) continue;;@}			\
+		*) ;;							\
+		esac;							\
+		tmp_f="$${f}.XXX";					\
+		if err=`${CTFCONVERT} -o "$${tmp_f}" "$${f}"`; then	\
+			if [ -f "$${tmp_f}" -a -f "$${f}" ]; then	\
+				${MV} "$${tmp_f}" "$${f}";		\
+			fi;						\
+		fi;							\
+		${RM} -f "$${tmp_f}";					\
+		if /bin/elfdump "$${f}"	| grep SUNW_ctf >/dev/null; then \
+			${ECHO} $${f}					\
+			    | ${SED} -e 's|^${DESTDIR}||'		\
+			    >>${WRKDIR}/.ctfdata;			\
+		else							\
+			${ECHO} "$${f}: $${err}"			\
+			    | ${SED} -e 's|^${DESTDIR}||'		\
+			    >>${WRKDIR}/.ctffail;			\
+		fi;							\
+	done
+
+######################################################################
 ### install-strip-debug (PRIVATE)
 ######################################################################
 ### install-strip-debug tries to strip debug information from
@@ -376,16 +418,17 @@ ${tgt}-multi:
 .PHONY: install-strip-debug
 install-strip-debug: plist
 	@${STEP_MSG} "Automatic stripping of debug information"
-	${RUN}${CAT} ${_PLIST_NOKEYWORDS} \
-	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|' \
-	| while read f; do \
-		tmp_f="$${f}.XXX"; \
-		if ${STRIP} -g -o "$${tmp_f}" "$${f}" 2> /dev/null; then \
-			[ ! -f "$${f}" ] || \
-			    ${MV} "$${tmp_f}" "$${f}"; \
-		else \
-			${RM} -f "$${tmp_f}"; \
-		fi \
+	${RUN}${CAT} ${_PLIST_NOKEYWORDS}				\
+	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
+	| while read f; do						\
+		[ ! -h "$${f}" ] || continue;				\
+		tmp_f="$${f}.XXX";					\
+		if ${STRIP_DBG} -o "$${tmp_f}" "$${f}" 2>/dev/null; then \
+			if [ -f "$${tmp_f}" -a -f "$${f}" ]; then	\
+				${MV} "$${tmp_f}" "$${f}";		\
+			fi;						\
+		fi;							\
+		${RM} -f "$${tmp_f}";					\
 	done
 
 ######################################################################
