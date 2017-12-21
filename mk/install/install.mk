@@ -354,7 +354,7 @@ install-ctf: plist
 		*) ;;							\
 		esac;							\
 		tmp_f="$${f}.XXX";					\
-		if err=`${CTFCONVERT} -o "$${tmp_f}" "$${f}"`; then	\
+		if err=`${CTFCONVERT} -o "$${tmp_f}" "$${f}" 2>&1`; then \
 			if [ -f "$${tmp_f}" -a -f "$${f}" ]; then	\
 				${MV} "$${tmp_f}" "$${f}";		\
 			fi;						\
