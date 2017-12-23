@@ -384,6 +384,10 @@ install-strip-debug: plist
 	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
 	| while read f; do						\
 		[ ! -h "$${f}" ] || continue;				\
+		case "$${f}" in						\
+		${STRIP_FILES_SKIP:@p@${p}) continue;;@}		\
+		*) ;;							\
+		esac;							\
 		tmp_f="$${f}.XXX";					\
 		if ${STRIP_DBG} -o "$${tmp_f}" "$${f}" 2>/dev/null; then \
 			if [ -f "$${tmp_f}" -a -f "$${f}" ]; then	\
