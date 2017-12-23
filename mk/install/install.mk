@@ -340,7 +340,7 @@ post-install:
 .PHONY: install-ctf
 install-ctf: plist
 	@${STEP_MSG} "Generating CTF data"
-	@${RM} -f ${WRKDIR}/.ctfdata ${WRKDIR}/.ctffail
+	@${RM} -f ${WRKDIR}/.ctfdata ${WRKDIR}/.ctffail ${WRKDIR}/.ctfnox
 	${RUN}${CAT} ${_PLIST_NOKEYWORDS}				\
 	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
 	| while read f; do						\
@@ -364,6 +364,9 @@ install-ctf: plist
 			${ECHO} $${f}					\
 			    | ${SED} -e 's|^${DESTDIR}||'		\
 			    >>${WRKDIR}/.ctfdata;			\
+			[ -x "$${f}" ] || ${ECHO} $${f}			\
+			    | ${SED} -e 's|^${DESTDIR}||'		\
+			    >>${WRKDIR}/.ctfnox;			\
 		else							\
 			${ECHO} "$${f}: $${err}"			\
 			    | ${SED} -e 's|^${DESTDIR}||'		\
