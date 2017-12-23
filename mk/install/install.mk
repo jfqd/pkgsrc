@@ -378,7 +378,7 @@ ${tgt}-multi:
 .PHONY: install-ctf
 install-ctf: plist
 	@${STEP_MSG} "Generating CTF data"
-	@${RM} -f ${WRKDIR}/.ctfdata ${WRKDIR}/.ctffail
+	@${RM} -f ${WRKDIR}/.ctfdata ${WRKDIR}/.ctffail ${WRKDIR}/.ctfnox
 	${RUN}${CAT} ${_PLIST_NOKEYWORDS}				\
 	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
 	| while read f; do						\
@@ -402,6 +402,9 @@ install-ctf: plist
 			${ECHO} $${f}					\
 			    | ${SED} -e 's|^${DESTDIR}||'		\
 			    >>${WRKDIR}/.ctfdata;			\
+			[ -x "$${f}" ] || ${ECHO} $${f}			\
+			    | ${SED} -e 's|^${DESTDIR}||'		\
+			    >>${WRKDIR}/.ctfnox;			\
 		else							\
 			${ECHO} "$${f}: $${err}"			\
 			    | ${SED} -e 's|^${DESTDIR}||'		\
@@ -422,6 +425,10 @@ install-strip-debug: plist
 	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
 	| while read f; do						\
 		[ ! -h "$${f}" ] || continue;				\
+		case "$${f}" in						\
+		${STRIP_FILES_SKIP:@p@${p}) continue;;@}		\
+		*) ;;							\
+		esac;							\
 		tmp_f="$${f}.XXX";					\
 		if ${STRIP_DBG} -o "$${tmp_f}" "$${f}" 2>/dev/null; then \
 			if [ -f "$${tmp_f}" -a -f "$${f}" ]; then	\
