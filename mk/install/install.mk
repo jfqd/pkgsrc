@@ -383,9 +383,8 @@ install-ctf: plist
 .PHONY: install-strip-debug
 install-strip-debug: plist
 	@${STEP_MSG} "Automatic stripping of debug information"
-	${RUN}${CAT} ${_PLIST_NOKEYWORDS}				\
-	| ${SED} -e 's|^|${DESTDIR}${PREFIX}/|'				\
-	| while read f; do						\
+	${RUN}cd ${DESTDIR:Q}${PREFIX:Q};				\
+	${CAT} ${_PLIST_NOKEYWORDS} | while read f; do			\
 		[ ! -h "$${f}" ] || continue;				\
 		case "$${f}" in						\
 		${STRIP_FILES_SKIP:@p@${p}) continue;;@}		\
