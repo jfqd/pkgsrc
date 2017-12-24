@@ -77,7 +77,7 @@ CHECK_RELRO_SKIP+=		go/pkg/bootstrap/bin/link
 CHECK_SSP_SKIP=			${CHECK_RELRO_SKIP}
 
 # Stripping go binaries breaks them in interesting ways
-STRIP_FILES_SKIP+=		${CHECK_RELRO_SKIP}
+STRIP_DEBUG_SUPPORTED=		no
 
 # uses /bin/rc (for Plan 9)
 CHECK_INTERPRETER_SKIP+=	go/include/plan9/mklibc.rc

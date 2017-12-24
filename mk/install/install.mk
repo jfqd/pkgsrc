@@ -195,7 +195,7 @@ _INSTALL_ALL_TARGETS+=		plist
 .if ${_PKGSRC_USE_CTF} == "yes"
 _INSTALL_ALL_TARGETS+=		install-ctf
 .endif
-.if !empty(STRIP_DEBUG:M[Yy][Ee][Ss])
+.if ${STRIP_DEBUG:Uno:tl} == "yes" && ${STRIP_DEBUG_SUPPORTED:Uyes:tl} == "yes"
 _INSTALL_ALL_TARGETS+=		install-strip-debug
 .endif
 _INSTALL_ALL_TARGETS+=		install-doc-handling
