@@ -177,7 +177,7 @@ CHECK_SHLIBS_SKIP+=		*/libHS*-ghc${PKGVERSION_NOREV}.*
 CTF_FILES_SKIP+=		*/libHSghc-7.6.3-ghc7.6.3.so
 
 # ld: fatal: relocation error ... relocation requires reference symbol
-STRIP_FILES_SKIP+=		lib/${PKGNAME}/libHSrts.a
+STRIP_FILES_SKIP+=		lib/${PKGNAME_NOREV}/libHSrts.a
 
 # -----------------------------------------------------------------------------
 # Dependencies
