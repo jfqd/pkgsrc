@@ -1,4 +1,4 @@
-$NetBSD: patch-src_sendmail.cc,v 1.1 2017/10/28 04:51:06 schmonz Exp $
+$NetBSD: patch-src_sendmail.cc,v 1.2 2018/01/28 23:31:16 wiedi Exp $
 
 Avoid "variable-sized object may not be initialized".
 

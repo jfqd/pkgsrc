@@ -1,4 +1,4 @@
-$NetBSD: distinfo,v 1.19 2017/10/28 04:51:06 schmonz Exp $
+$NetBSD: distinfo,v 1.20 2018/01/28 23:31:16 wiedi Exp $
 
 SHA1 (nullmailer-2.1.tar.gz) = 79322908cb242a80f72f8e2888ac870f2f311bcf
 RMD160 (nullmailer-2.1.tar.gz) = 834f7d5c8ee387c5d7b15663f0aa00c7f04f795f
