@@ -1,10 +1,12 @@
-# $NetBSD: Makefile,v 1.28 2017/11/12 16:03:35 khorben Exp $
+# $NetBSD: Makefile,v 1.32 2018/04/04 13:04:18 jperkin Exp $
 
 DISTNAME=	ghostscript-${GS_VERSION}
 PKGNAME=	${DISTNAME:S/ghostscript/ghostscript-agpl/}
-PKGREVISION=	1
 CATEGORIES=	print
-MASTER_SITES=	${MASTER_SITE_GITHUB:=ArtifexSoftware/ghostpdl-downloads/releases/download/gs922/}
+MASTER_SITES=	${MASTER_SITE_GITHUB:=ArtifexSoftware/}
+GITHUB_PROJECT=	ghostpdl-downloads
+GITHUB_RELEASE=	gs${GS_VERSION:S/.//}
+EXTRACT_SUFX=	.tar.xz
 
 MAINTAINER=	pkgsrc-users@NetBSD.org
 HOMEPAGE=	https://ghostscript.com/
@@ -60,6 +62,13 @@ SUBST_SED.resdir=	-e "s|/Resource/|${GS_RESOURCEDIR}/|g"
 # used when making a shared object; recompile with -fPIC
 .if !empty(PKGSRC_COMPILER:Mgcc) || !empty(PKGSRC_COMPILER:Mclang)
 CFLAGS+=		-fPIC
+.endif
+
+# Not ideal but too many files hardcode _XOPEN_SOURCE=500.
+.if !empty(CC_VERSION:Mgcc-[6-9]*) || !empty(PKGSRC_COMPILER:Mclang)
+CPPFLAGS.SunOS+=	-D_XOPEN_SOURCE=600 -D__EXTENSIONS__
+.else
+CPPFLAGS.SunOS+=	-D__C99FEATURES__
 .endif
 
 # Interim IRIX build fix, the real problem is that fontconfig.pc doesn't
